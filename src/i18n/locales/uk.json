@@ -1,0 +1,22 @@
+{
+  "auth": {
+    "welcome": "Croatian Grammar — Адмін",
+    "signInWithGoogle": "Увійти через Google"
+  },
+  "nav": {
+    "categories": "Категорії",
+    "wordSets": "Набори слів",
+    "words": "Слова",
+    "logout": "Вийти"
+  },
+  "common": {
+    "loading": "Завантаження...",
+    "error": "Сталася помилка",
+    "retry": "Повторити",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "create": "Створити"
+  }
+}

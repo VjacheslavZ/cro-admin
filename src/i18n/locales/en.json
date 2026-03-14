@@ -1,0 +1,22 @@
+{
+  "auth": {
+    "welcome": "Croatian Grammar Admin",
+    "signInWithGoogle": "Sign in with Google"
+  },
+  "nav": {
+    "categories": "Categories",
+    "wordSets": "Word Sets",
+    "words": "Words",
+    "logout": "Logout"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create"
+  }
+}
