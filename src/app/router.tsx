@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
 import { LoginPage } from '../features/auth/LoginPage';
 
 export function AppRouter() {

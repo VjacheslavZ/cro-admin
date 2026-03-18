@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
 import { I18nextProvider } from 'react-i18next';
+
 import { queryClient } from '../api/query-client';
 import i18n from '../i18n';
 
