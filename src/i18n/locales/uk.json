@@ -1,13 +1,25 @@
 {
   "auth": {
     "welcome": "Croatian Grammar — Адмін",
-    "signInWithGoogle": "Увійти через Google"
+    "email": "Email",
+    "password": "Пароль",
+    "signIn": "Увійти",
+    "invalidCredentials": "Невірний email або пароль"
   },
   "nav": {
     "categories": "Категорії",
     "wordSets": "Набори слів",
     "words": "Слова",
+    "admins": "Адміни",
     "logout": "Вийти"
+  },
+  "admins": {
+    "email": "Email",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердіть пароль",
+    "createdAt": "Дата створення",
+    "createAdmin": "Створити адміна",
+    "created": "Адміна успішно створено"
   },
   "common": {
     "loading": "Завантаження...",

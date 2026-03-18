@@ -4,6 +4,7 @@ import { ThemeProvider, CssBaseline, createTheme } from '@mui/material';
 import { I18nextProvider } from 'react-i18next';
 
 import { queryClient } from '../api/query-client';
+import { AuthProvider } from '../features/auth/auth-context';
 import i18n from '../i18n';
 
 const theme = createTheme({
@@ -19,7 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <I18nextProvider i18n={i18n}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </I18nextProvider>
     </QueryClientProvider>
