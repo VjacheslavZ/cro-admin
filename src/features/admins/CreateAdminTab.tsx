@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
 import { apiClient } from '../../api/client';
 
@@ -26,7 +25,6 @@ interface CreateAdminTabProps {
 }
 
 export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
-  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -62,7 +60,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
       ) {
         setError((err as { response: { data: { message: string } } }).response.data.message);
       } else {
-        setError(t('common.error'));
+        setError('An error occurred');
       }
     },
   });
@@ -77,7 +75,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
     <Paper sx={{ p: 3, maxWidth: 500 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          {t('admins.created')}
+          Admin created successfully
         </Alert>
       )}
       {error && (
@@ -89,7 +87,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
       <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <TextField
           {...register('email')}
-          label={t('admins.email')}
+          label="Email"
           type="email"
           fullWidth
           margin="normal"
@@ -99,7 +97,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
         />
         <TextField
           {...register('password')}
-          label={t('admins.password')}
+          label="Password"
           type="password"
           fullWidth
           margin="normal"
@@ -109,7 +107,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
         />
         <TextField
           {...register('confirmPassword')}
-          label={t('admins.confirmPassword')}
+          label="Confirm Password"
           type="password"
           fullWidth
           margin="normal"
@@ -124,7 +122,7 @@ export function CreateAdminTab({ onCreated }: CreateAdminTabProps) {
           disabled={mutation.isPending}
           sx={{ mt: 2 }}
         >
-          {mutation.isPending ? <CircularProgress size={24} /> : t('admins.createAdmin')}
+          {mutation.isPending ? <CircularProgress size={24} /> : 'Create Admin'}
         </Button>
       </Box>
     </Paper>

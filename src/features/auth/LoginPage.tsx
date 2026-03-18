@@ -9,7 +9,6 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,7 +24,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
-  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +42,7 @@ export function LoginPage() {
       await login(data.email, data.password);
       navigate('/', { replace: true });
     } catch {
-      setError(t('auth.invalidCredentials'));
+      setError('Invalid email or password');
     }
   };
 
@@ -60,7 +58,7 @@ export function LoginPage() {
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
           <Typography variant="h4" gutterBottom textAlign="center">
-            {t('auth.welcome')}
+            Croatian Grammar Admin
           </Typography>
 
           {error && (
@@ -72,7 +70,7 @@ export function LoginPage() {
           <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
             <TextField
               {...register('email')}
-              label={t('auth.email')}
+              label="Email"
               type="email"
               fullWidth
               margin="normal"
@@ -83,7 +81,7 @@ export function LoginPage() {
             />
             <TextField
               {...register('password')}
-              label={t('auth.password')}
+              label="Password"
               type="password"
               fullWidth
               margin="normal"
@@ -99,7 +97,7 @@ export function LoginPage() {
               disabled={isSubmitting}
               sx={{ mt: 3 }}
             >
-              {isSubmitting ? <CircularProgress size={24} /> : t('auth.signIn')}
+              {isSubmitting ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
           </Box>
         </Paper>

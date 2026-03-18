@@ -11,7 +11,6 @@ import {
   Box,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
 import { apiClient } from '../../api/client';
 
@@ -22,8 +21,6 @@ interface Admin {
 }
 
 export function AdminsTab() {
-  const { t } = useTranslation();
-
   const {
     data: admins,
     isLoading,
@@ -45,7 +42,7 @@ export function AdminsTab() {
   }
 
   if (error) {
-    return <Alert severity="error">{t('common.error')}</Alert>;
+    return <Alert severity="error">An error occurred</Alert>;
   }
 
   return (
@@ -53,8 +50,8 @@ export function AdminsTab() {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>{t('admins.email')}</TableCell>
-            <TableCell>{t('admins.createdAt')}</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Created At</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

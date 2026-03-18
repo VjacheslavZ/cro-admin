@@ -21,27 +21,25 @@ import {
   People as PeopleIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../features/auth/auth-context';
 
 const DRAWER_WIDTH = 240;
 
 interface NavItem {
-  labelKey: string;
+  label: string;
   path: string;
   icon: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
-  { labelKey: 'nav.categories', path: '/categories', icon: <CategoryIcon /> },
-  { labelKey: 'nav.wordSets', path: '/word-sets', icon: <WordSetsIcon /> },
-  { labelKey: 'nav.words', path: '/words', icon: <WordsIcon /> },
-  { labelKey: 'nav.admins', path: '/admins', icon: <PeopleIcon /> },
+  { label: 'Categories', path: '/categories', icon: <CategoryIcon /> },
+  { label: 'Word Sets', path: '/word-sets', icon: <WordSetsIcon /> },
+  { label: 'Words', path: '/words', icon: <WordsIcon /> },
+  { label: 'Admins', path: '/admins', icon: <PeopleIcon /> },
 ];
 
 export function AppLayout() {
-  const { t } = useTranslation();
   const { logout, admin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,7 +69,7 @@ export function AppLayout() {
             }}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={t(item.labelKey)} />
+            <ListItemText primary={item.label} />
           </ListItemButton>
         ))}
       </List>
@@ -81,7 +79,7 @@ export function AppLayout() {
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary={t('nav.logout')} />
+          <ListItemText primary="Logout" />
         </ListItemButton>
       </List>
     </Box>
@@ -100,7 +98,7 @@ export function AppLayout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            {t('auth.welcome')}
+            Croatian Grammar Admin
           </Typography>
           {admin && (
             <Typography variant="body2" color="inherit">
