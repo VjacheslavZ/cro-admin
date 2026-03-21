@@ -2,8 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { useAuth } from '../features/auth/auth-context';
 import { LoginPage } from '../features/auth/LoginPage';
-import { AppLayout } from './AppLayout';
 import { AdminsPage } from '../features/admins/AdminsPage';
+import { CategoriesPage } from '../features/categories/CategoriesPage';
+import { WordSetsPage } from '../features/word-sets/WordSetsPage';
+import { WordsPage } from '../features/words/WordsPage';
+import { AppLayout } from './AppLayout';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -42,9 +45,9 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route path="/categories" element={<div>Categories (placeholder)</div>} />
-          <Route path="/word-sets" element={<div>Word Sets (placeholder)</div>} />
-          <Route path="/words" element={<div>Words (placeholder)</div>} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/word-sets" element={<WordSetsPage />} />
+          <Route path="/words" element={<WordsPage />} />
           <Route path="/admins" element={<AdminsPage />} />
           <Route path="/" element={<Navigate to="/categories" replace />} />
         </Route>
