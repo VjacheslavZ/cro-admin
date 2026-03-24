@@ -61,10 +61,14 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     },
   });
 
+  const [serverError, setServerError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     reset,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -87,6 +91,7 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
       }
     },
     onSuccess: () => {
+      setServerError(null);
       queryClient.invalidateQueries({ queryKey: ['singular-plural-items', topicId] });
       reset({
         baseForm: '',
@@ -98,6 +103,18 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
       });
       setEditing(null);
       setShowForm(false);
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+      ) {
+        setServerError((err as { response: { data: { message: string } } }).response.data.message);
+      } else {
+        setServerError('An error occurred');
+      }
     },
   });
 
@@ -114,6 +131,26 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     setEditing(item);
     setShowForm(true);
     reset(item);
+  };
+
+  const validateBaseFormUnique = async (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    try {
+      const { data: allItems } = await apiClient.get<Item[]>(
+        `/admin/topics/${topicId}/singular-plural-items`,
+      );
+      const duplicate = allItems.find(
+        (item) => item.baseForm === trimmed && item.id !== editing?.id,
+      );
+      if (duplicate) {
+        setError('baseForm', { message: 'This word already exists' });
+      } else {
+        clearErrors('baseForm');
+      }
+    } catch {
+      // skip validation on network error
+    }
   };
 
   if (isLoading)
@@ -146,12 +183,20 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
         {showForm ? 'Cancel' : 'Add Item'}
       </Button>
 
+      {serverError && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setServerError(null)}>
+          {serverError}
+        </Alert>
+      )}
+
       {showForm && (
         <Paper sx={{ p: 2, mb: 2 }}>
           <Box component="form" onSubmit={handleSubmit((d) => saveMutation.mutate(d))}>
             <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
               <TextField
-                {...register('baseForm')}
+                {...register('baseForm', {
+                  onBlur: (e) => validateBaseFormUnique(e.target.value),
+                })}
                 label="Base Form"
                 size="small"
                 error={!!errors.baseForm}
