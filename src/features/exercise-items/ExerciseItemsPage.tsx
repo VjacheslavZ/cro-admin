@@ -29,7 +29,7 @@ interface TopicDetail {
 }
 
 const EXERCISE_TABS = [
-  { type: ExerciseType.JEDNINA_MNOZINA, label: 'Type the Answer' },
+  { type: ExerciseType.TYPE_THE_ANSWER, label: 'Type the Answer' },
   { type: ExerciseType.FLASHCARDS, label: 'Flashcards' },
   { type: ExerciseType.FILL_IN_BLANK, label: 'Fill in Blank' },
 ];
@@ -116,7 +116,7 @@ export function ExerciseItemsPage() {
         </Tabs>
       </Box>
 
-      {currentTab.type === ExerciseType.JEDNINA_MNOZINA && <SingularPluralTab topicId={topicId!} />}
+      {currentTab.type === ExerciseType.TYPE_THE_ANSWER && <SingularPluralTab topicId={topicId!} />}
       {currentTab.type === ExerciseType.FLASHCARDS && <FlashcardsTab topicId={topicId!} />}
       {currentTab.type === ExerciseType.FILL_IN_BLANK && <FillInBlankTab topicId={topicId!} />}
     </Box>

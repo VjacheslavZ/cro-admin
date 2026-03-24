@@ -21,7 +21,7 @@ import { apiClient } from '../../api/client';
 import type { TopicData } from './TopicsPage';
 
 const TYPE_LABELS: Record<string, string> = {
-  JEDNINA_MNOZINA: 'Type',
+  TYPE_THE_ANSWER: 'Type',
   FLASHCARDS: 'Flash',
   FILL_IN_BLANK: 'FIB',
 };
