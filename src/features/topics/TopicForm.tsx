@@ -15,9 +15,9 @@ import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '../../api/client';
-import type { CategoryData } from './CategoriesPage';
+import type { TopicData } from './TopicsPage';
 
-const categorySchema = z.object({
+const topicSchema = z.object({
   nameHr: z.string().min(1, 'Name (HR) is required'),
   nameRu: z.string().min(1, 'Name (RU) is required'),
   nameUk: z.string().min(1, 'Name (UK) is required'),
@@ -26,34 +26,34 @@ const categorySchema = z.object({
   isActive: z.boolean(),
 });
 
-type CategoryFormData = z.infer<typeof categorySchema>;
+type TopicFormData = z.infer<typeof topicSchema>;
 
-interface CategoryFormProps {
-  category: CategoryData | null;
+interface TopicFormProps {
+  topic: TopicData | null;
   onDone: () => void;
 }
 
-export function CategoryForm({ category, onDone }: CategoryFormProps) {
+export function TopicForm({ topic, onDone }: TopicFormProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const isEditing = !!category;
+  const isEditing = !!topic;
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: category
+  } = useForm<TopicFormData>({
+    resolver: zodResolver(topicSchema),
+    defaultValues: topic
       ? {
-          nameHr: category.nameHr,
-          nameRu: category.nameRu,
-          nameUk: category.nameUk,
-          nameEn: category.nameEn,
-          sortOrder: category.sortOrder,
-          isActive: category.isActive,
+          nameHr: topic.nameHr,
+          nameRu: topic.nameRu,
+          nameUk: topic.nameUk,
+          nameEn: topic.nameEn,
+          sortOrder: topic.sortOrder,
+          isActive: topic.isActive,
         }
       : {
           nameHr: '',
@@ -66,16 +66,16 @@ export function CategoryForm({ category, onDone }: CategoryFormProps) {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: CategoryFormData) => {
+    mutationFn: async (data: TopicFormData) => {
       if (isEditing) {
-        const { data: result } = await apiClient.patch(`/admin/categories/${category.id}`, data);
+        const { data: result } = await apiClient.patch(`/admin/topics/${topic.id}`, data);
         return result;
       }
-      const { data: result } = await apiClient.post('/admin/categories', data);
+      const { data: result } = await apiClient.post('/admin/topics', data);
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['topics'] });
       setSuccess(true);
       setError(null);
       if (!isEditing) reset();
@@ -96,7 +96,7 @@ export function CategoryForm({ category, onDone }: CategoryFormProps) {
     },
   });
 
-  const onSubmit = (data: CategoryFormData) => {
+  const onSubmit = (data: TopicFormData) => {
     setError(null);
     setSuccess(false);
     mutation.mutate(data);
@@ -106,7 +106,7 @@ export function CategoryForm({ category, onDone }: CategoryFormProps) {
     <Paper sx={{ p: 3, maxWidth: 600 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Category {isEditing ? 'updated' : 'created'} successfully
+          Topic {isEditing ? 'updated' : 'created'} successfully
         </Alert>
       )}
       {error && (
@@ -158,9 +158,7 @@ export function CategoryForm({ category, onDone }: CategoryFormProps) {
           helperText={errors.sortOrder?.message}
         />
         <FormControlLabel
-          control={
-            <Checkbox {...register('isActive')} defaultChecked={category?.isActive ?? true} />
-          }
+          control={<Checkbox {...register('isActive')} defaultChecked={topic?.isActive ?? true} />}
           label="Active"
           sx={{ mt: 1 }}
         />
@@ -174,9 +172,9 @@ export function CategoryForm({ category, onDone }: CategoryFormProps) {
           {mutation.isPending ? (
             <CircularProgress size={24} />
           ) : isEditing ? (
-            'Update Category'
+            'Update Topic'
           ) : (
-            'Create Category'
+            'Create Topic'
           )}
         </Button>
       </Box>

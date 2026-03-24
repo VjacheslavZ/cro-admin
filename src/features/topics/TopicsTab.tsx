@@ -11,12 +11,20 @@ import {
   Box,
   Chip,
   IconButton,
+  Stack,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 import { apiClient } from '../../api/client';
-import type { CategoryData } from './CategoriesPage';
+import type { TopicData } from './TopicsPage';
+
+const TYPE_LABELS: Record<string, string> = {
+  JEDNINA_MNOZINA: 'Type',
+  FLASHCARDS: 'Flash',
+  FILL_IN_BLANK: 'FIB',
+};
 
 function getAxiosErrorMessage(err: unknown): string {
   if (
@@ -30,31 +38,32 @@ function getAxiosErrorMessage(err: unknown): string {
   return 'An error occurred';
 }
 
-interface CategoriesTabProps {
-  onEdit: (category: CategoryData) => void;
+interface TopicsTabProps {
+  onEdit: (topic: TopicData) => void;
 }
 
-export function CategoriesTab({ onEdit }: CategoriesTabProps) {
+export function TopicsTab({ onEdit }: TopicsTabProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const {
-    data: categories,
+    data: topics,
     isLoading,
     error,
-  } = useQuery<CategoryData[]>({
-    queryKey: ['categories'],
+  } = useQuery<TopicData[]>({
+    queryKey: ['topics'],
     queryFn: async () => {
-      const { data } = await apiClient.get('/admin/categories');
+      const { data } = await apiClient.get('/admin/topics');
       return data;
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/admin/categories/${id}`);
+      await apiClient.delete(`/admin/topics/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['topics'] });
     },
     onError: (err: unknown) => {
       alert(getAxiosErrorMessage(err));
@@ -70,7 +79,7 @@ export function CategoriesTab({ onEdit }: CategoriesTabProps) {
   }
 
   if (error) {
-    return <Alert severity="error">Failed to load categories</Alert>;
+    return <Alert severity="error">Failed to load topics</Alert>;
   }
 
   return (
@@ -80,32 +89,60 @@ export function CategoriesTab({ onEdit }: CategoriesTabProps) {
           <TableRow>
             <TableCell>Name (HR)</TableCell>
             <TableCell>Name (EN)</TableCell>
+            <TableCell>Exercise Types</TableCell>
             <TableCell>Sort Order</TableCell>
             <TableCell>Active</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {categories?.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell>{category.nameHr}</TableCell>
-              <TableCell>{category.nameEn}</TableCell>
-              <TableCell>{category.sortOrder}</TableCell>
+          {topics?.map((topic) => (
+            <TableRow
+              key={topic.id}
+              hover
+              sx={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/topics/${topic.id}/items`)}
+            >
+              <TableCell>{topic.nameHr}</TableCell>
+              <TableCell>{topic.nameEn}</TableCell>
+              <TableCell>
+                <Stack direction="row" spacing={0.5}>
+                  {topic.exerciseTypes.map((type) => (
+                    <Chip
+                      key={type}
+                      label={TYPE_LABELS[type] || type}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                </Stack>
+              </TableCell>
+              <TableCell>{topic.sortOrder}</TableCell>
               <TableCell>
                 <Chip
-                  label={category.isActive ? 'Yes' : 'No'}
-                  color={category.isActive ? 'success' : 'default'}
+                  label={topic.isActive ? 'Yes' : 'No'}
+                  color={topic.isActive ? 'success' : 'default'}
                   size="small"
                 />
               </TableCell>
               <TableCell>
-                <IconButton size="small" onClick={() => onEdit(category)}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(topic);
+                  }}
+                >
                   <EditIcon />
                 </IconButton>
                 <IconButton
                   size="small"
                   color="error"
-                  onClick={() => deleteMutation.mutate(category.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMutation.mutate(topic.id);
+                  }}
                   disabled={deleteMutation.isPending}
                 >
                   <DeleteIcon />
