@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { apiClient } from '../../api/client';
+import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import type { TopicData } from './TopicsPage';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -45,6 +47,7 @@ interface TopicsTabProps {
 export function TopicsTab({ onEdit }: TopicsTabProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const {
     data: topics,
@@ -63,9 +66,11 @@ export function TopicsTab({ onEdit }: TopicsTabProps) {
       await apiClient.delete(`/admin/topics/${id}`);
     },
     onSuccess: () => {
+      setDeleteTargetId(null);
       queryClient.invalidateQueries({ queryKey: ['topics'] });
     },
     onError: (err: unknown) => {
+      setDeleteTargetId(null);
       alert(getAxiosErrorMessage(err));
     },
   });
@@ -83,75 +88,88 @@ export function TopicsTab({ onEdit }: TopicsTabProps) {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name (HR)</TableCell>
-            <TableCell>Name (EN)</TableCell>
-            <TableCell>Exercise Types</TableCell>
-            <TableCell>Sort Order</TableCell>
-            <TableCell>Active</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {topics?.map((topic) => (
-            <TableRow
-              key={topic.id}
-              hover
-              sx={{ cursor: 'pointer' }}
-              onClick={() => navigate(`/topics/${topic.id}/items`)}
-            >
-              <TableCell>{topic.nameHr}</TableCell>
-              <TableCell>{topic.nameEn}</TableCell>
-              <TableCell>
-                <Stack direction="row" spacing={0.5}>
-                  {topic.exerciseTypes.map((type) => (
-                    <Chip
-                      key={type}
-                      label={TYPE_LABELS[type] || type}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  ))}
-                </Stack>
-              </TableCell>
-              <TableCell>{topic.sortOrder}</TableCell>
-              <TableCell>
-                <Chip
-                  label={topic.isActive ? 'Yes' : 'No'}
-                  color={topic.isActive ? 'success' : 'default'}
-                  size="small"
-                />
-              </TableCell>
-              <TableCell>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(topic);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteMutation.mutate(topic.id);
-                  }}
-                  disabled={deleteMutation.isPending}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
+    <>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name (HR)</TableCell>
+              <TableCell>Name (EN)</TableCell>
+              <TableCell>Exercise Types</TableCell>
+              <TableCell>Sort Order</TableCell>
+              <TableCell>Active</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {topics?.map((topic) => (
+              <TableRow
+                key={topic.id}
+                hover
+                sx={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/topics/${topic.id}/items`)}
+              >
+                <TableCell>{topic.nameHr}</TableCell>
+                <TableCell>{topic.nameEn}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={0.5}>
+                    {topic.exerciseTypes.map((type) => (
+                      <Chip
+                        key={type}
+                        label={TYPE_LABELS[type] || type}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
+                </TableCell>
+                <TableCell>{topic.sortOrder}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={topic.isActive ? 'Yes' : 'No'}
+                    color={topic.isActive ? 'success' : 'default'}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(topic);
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTargetId(topic.id);
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <ConfirmDeleteDialog
+        open={deleteTargetId !== null}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={() => {
+          if (deleteTargetId) deleteMutation.mutate(deleteTargetId);
+        }}
+        isPending={deleteMutation.isPending}
+        title="Delete Topic"
+        message="Are you sure you want to delete this topic? This action cannot be undone."
+      />
+    </>
   );
 }
