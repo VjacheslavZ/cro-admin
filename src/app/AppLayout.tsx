@@ -15,9 +15,7 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Category as CategoryIcon,
-  ViewList as WordSetsIcon,
-  Abc as WordsIcon,
+  Quiz as TopicsIcon,
   People as PeopleIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
@@ -33,9 +31,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Categories', path: '/categories', icon: <CategoryIcon /> },
-  { label: 'Word Sets', path: '/word-sets', icon: <WordSetsIcon /> },
-  { label: 'Words', path: '/words', icon: <WordsIcon /> },
+  { label: 'Topics', path: '/topics', icon: <TopicsIcon /> },
   { label: 'Admins', path: '/admins', icon: <PeopleIcon /> },
 ];
 
@@ -62,7 +58,7 @@ export function AppLayout() {
         {navItems.map((item) => (
           <ListItemButton
             key={item.path}
-            selected={location.pathname === item.path}
+            selected={location.pathname.startsWith(item.path)}
             onClick={() => {
               navigate(item.path);
               setMobileOpen(false);

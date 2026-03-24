@@ -3,9 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/auth-context';
 import { LoginPage } from '../features/auth/LoginPage';
 import { AdminsPage } from '../features/admins/AdminsPage';
-import { CategoriesPage } from '../features/categories/CategoriesPage';
-import { WordSetsPage } from '../features/word-sets/WordSetsPage';
-import { WordsPage } from '../features/words/WordsPage';
+import { TopicsPage } from '../features/topics/TopicsPage';
+import { ExerciseItemsPage } from '../features/exercise-items/ExerciseItemsPage';
 import { AppLayout } from './AppLayout';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -45,11 +44,10 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/word-sets" element={<WordSetsPage />} />
-          <Route path="/words" element={<WordsPage />} />
+          <Route path="/topics" element={<TopicsPage />} />
+          <Route path="/topics/:topicId/items" element={<ExerciseItemsPage />} />
           <Route path="/admins" element={<AdminsPage />} />
-          <Route path="/" element={<Navigate to="/categories" replace />} />
+          <Route path="/" element={<Navigate to="/topics" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
