@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { apiClient } from '../../api/client';
+import { useTablePagination } from '../../shared/hooks/useTablePagination';
 
 const schema = z.object({
   frontText: z.string().min(1, 'Required'),
@@ -58,6 +59,8 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
       return data;
     },
   });
+
+  const { paginatedItems, Pagination } = useTablePagination(items);
 
   const {
     register,
@@ -211,7 +214,7 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items?.map((item) => (
+            {paginatedItems.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.frontText}</TableCell>
                 <TableCell>{item.translationEn}</TableCell>
@@ -235,6 +238,7 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
             ))}
           </TableBody>
         </Table>
+        <Pagination />
       </TableContainer>
     </Box>
   );

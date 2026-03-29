@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { apiClient } from '../../api/client';
+import { useTablePagination } from '../../shared/hooks/useTablePagination';
 
 const schema = z.object({
   sentenceHr: z.string().min(1, 'Required'),
@@ -60,6 +61,8 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
       return data;
     },
   });
+
+  const { paginatedItems, Pagination } = useTablePagination(items);
 
   const defaultValues = {
     sentenceHr: '',
@@ -212,7 +215,7 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items?.map((item) => (
+            {paginatedItems.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.sentenceHr}</TableCell>
                 <TableCell>{item.blankAnswer}</TableCell>
@@ -237,6 +240,7 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
             ))}
           </TableBody>
         </Table>
+        <Pagination />
       </TableContainer>
     </Box>
   );
