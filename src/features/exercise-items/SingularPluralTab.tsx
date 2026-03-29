@@ -262,6 +262,7 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
               <TableCell>Base Form</TableCell>
               <TableCell>Plural Form</TableCell>
               <TableCell>EN</TableCell>
+              <TableCell>UA</TableCell>
               <TableCell>RU</TableCell>
               <TableCell>Order</TableCell>
               <TableCell>Actions</TableCell>
@@ -273,6 +274,7 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
                 <TableCell>{item.baseForm}</TableCell>
                 <TableCell>{item.pluralForm}</TableCell>
                 <TableCell>{item.translationEn}</TableCell>
+                <TableCell>{item.translationUk}</TableCell>
                 <TableCell>{item.translationRu}</TableCell>
                 <TableCell>{item.sortOrder}</TableCell>
                 <TableCell>

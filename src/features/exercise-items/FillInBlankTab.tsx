@@ -205,6 +205,8 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
               <TableCell>Sentence</TableCell>
               <TableCell>Answer</TableCell>
               <TableCell>EN</TableCell>
+              <TableCell>UA</TableCell>
+              <TableCell>RU</TableCell>
               <TableCell>Order</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -215,6 +217,8 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
                 <TableCell>{item.sentenceHr}</TableCell>
                 <TableCell>{item.blankAnswer}</TableCell>
                 <TableCell>{item.translationEn}</TableCell>
+                <TableCell>{item.translationUk}</TableCell>
+                <TableCell>{item.translationRu}</TableCell>
                 <TableCell>{item.sortOrder}</TableCell>
                 <TableCell>
                   <IconButton size="small" onClick={() => handleEdit(item)}>

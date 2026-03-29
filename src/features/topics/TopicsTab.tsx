@@ -95,6 +95,8 @@ export function TopicsTab({ onEdit }: TopicsTabProps) {
             <TableRow>
               <TableCell>Name (HR)</TableCell>
               <TableCell>Name (EN)</TableCell>
+              <TableCell>Name (UA)</TableCell>
+              <TableCell>Name (RU)</TableCell>
               <TableCell>Exercise Types</TableCell>
               <TableCell>Sort Order</TableCell>
               <TableCell>Active</TableCell>
@@ -111,6 +113,8 @@ export function TopicsTab({ onEdit }: TopicsTabProps) {
               >
                 <TableCell>{topic.nameHr}</TableCell>
                 <TableCell>{topic.nameEn}</TableCell>
+                <TableCell>{topic.nameUk}</TableCell>
+                <TableCell>{topic.nameRu}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={0.5}>
                     {topic.exerciseTypes.map((type) => (

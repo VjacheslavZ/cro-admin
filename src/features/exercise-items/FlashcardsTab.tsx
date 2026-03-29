@@ -204,8 +204,8 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
             <TableRow>
               <TableCell>Front Text</TableCell>
               <TableCell>EN</TableCell>
+              <TableCell>UA</TableCell>
               <TableCell>RU</TableCell>
-              <TableCell>UK</TableCell>
               <TableCell>Order</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -215,8 +215,8 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
               <TableRow key={item.id}>
                 <TableCell>{item.frontText}</TableCell>
                 <TableCell>{item.translationEn}</TableCell>
-                <TableCell>{item.translationRu}</TableCell>
                 <TableCell>{item.translationUk}</TableCell>
+                <TableCell>{item.translationRu}</TableCell>
                 <TableCell>{item.sortOrder}</TableCell>
                 <TableCell>
                   <IconButton size="small" onClick={() => handleEdit(item)}>
