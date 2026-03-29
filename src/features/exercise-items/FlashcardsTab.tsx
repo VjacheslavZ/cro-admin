@@ -65,7 +65,7 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: {
       frontText: '',
       translationRu: '',

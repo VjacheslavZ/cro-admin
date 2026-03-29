@@ -45,7 +45,7 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
     reset,
     formState: { errors },
   } = useForm<TopicFormData>({
-    resolver: zodResolver(topicSchema),
+    resolver: zodResolver(topicSchema) as never,
     defaultValues: topic
       ? {
           nameHr: topic.nameHr,

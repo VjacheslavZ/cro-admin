@@ -71,7 +71,7 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     clearErrors,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: {
       baseForm: '',
       pluralForm: '',
