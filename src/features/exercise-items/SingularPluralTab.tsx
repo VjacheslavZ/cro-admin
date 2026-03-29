@@ -1,19 +1,6 @@
 import { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Alert,
-  Box,
-  IconButton,
-  Button,
-} from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { CircularProgress, Alert, Box, Button } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '../../api/client';
@@ -23,6 +10,7 @@ import {
   type SingularPluralFormData,
   type SingularPluralItem,
 } from './components/SingularPluralForm';
+import { SingularPluralTable } from './components/SingularPluralTable';
 
 export function SingularPluralTab({ topicId }: { topicId: string }) {
   const queryClient = useQueryClient();
@@ -82,11 +70,6 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     },
   });
 
-  const handleEdit = (item: SingularPluralItem) => {
-    setEditing(item);
-    setShowForm(true);
-  };
-
   if (isLoading)
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -124,47 +107,16 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
         />
       )}
 
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Base Form</TableCell>
-              <TableCell>Plural Form</TableCell>
-              <TableCell>EN</TableCell>
-              <TableCell>UA</TableCell>
-              <TableCell>RU</TableCell>
-              <TableCell>Order</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedItems.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.baseForm}</TableCell>
-                <TableCell>{item.pluralForm}</TableCell>
-                <TableCell>{item.translationEn}</TableCell>
-                <TableCell>{item.translationUk}</TableCell>
-                <TableCell>{item.translationRu}</TableCell>
-                <TableCell>{item.sortOrder}</TableCell>
-                <TableCell>
-                  <IconButton size="small" onClick={() => handleEdit(item)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => deleteMutation.mutate(item.id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <Pagination />
-      </TableContainer>
+      <SingularPluralTable
+        items={paginatedItems}
+        onEdit={(item) => {
+          setEditing(item);
+          setShowForm(true);
+        }}
+        onDelete={(id) => deleteMutation.mutate(id)}
+        isDeletePending={deleteMutation.isPending}
+        Pagination={Pagination}
+      />
     </Box>
   );
 }
