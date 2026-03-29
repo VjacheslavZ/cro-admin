@@ -12,49 +12,28 @@ import {
   Box,
   IconButton,
   Button,
-  TextField,
-  Stack,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { apiClient } from '../../api/client';
 import { useTablePagination } from '../../shared/hooks/useTablePagination';
-
-const schema = z.object({
-  baseForm: z.string().min(1, 'Required'),
-  pluralForm: z.string().min(1, 'Required'),
-  translationRu: z.string().min(1, 'Required'),
-  translationUk: z.string().min(1, 'Required'),
-  translationEn: z.string().min(1, 'Required'),
-  sortOrder: z.coerce.number().int().min(0),
-});
-
-type FormData = z.infer<typeof schema>;
-
-interface Item {
-  id: string;
-  baseForm: string;
-  pluralForm: string;
-  translationRu: string;
-  translationUk: string;
-  translationEn: string;
-  sortOrder: number;
-}
+import {
+  SingularPluralForm,
+  type SingularPluralFormData,
+  type SingularPluralItem,
+} from './components/SingularPluralForm';
 
 export function SingularPluralTab({ topicId }: { topicId: string }) {
   const queryClient = useQueryClient();
-  const [editing, setEditing] = useState<Item | null>(null);
+  const [editing, setEditing] = useState<SingularPluralItem | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const {
     data: items,
     isLoading,
     error,
-  } = useQuery<Item[]>({
+  } = useQuery<SingularPluralItem[]>({
     queryKey: ['singular-plural-items', topicId],
     queryFn: async () => {
       const { data } = await apiClient.get(`/admin/topics/${topicId}/singular-plural-items`);
@@ -66,27 +45,8 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
 
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    clearErrors,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema) as never,
-    defaultValues: {
-      baseForm: '',
-      pluralForm: '',
-      translationRu: '',
-      translationUk: '',
-      translationEn: '',
-      sortOrder: 0,
-    },
-  });
-
   const saveMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: SingularPluralFormData) => {
       if (editing) {
         await apiClient.patch(`/admin/singular-plural-items/${editing.id}`, data);
       } else {
@@ -96,14 +56,6 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     onSuccess: () => {
       setServerError(null);
       queryClient.invalidateQueries({ queryKey: ['singular-plural-items', topicId] });
-      reset({
-        baseForm: '',
-        pluralForm: '',
-        translationRu: '',
-        translationUk: '',
-        translationEn: '',
-        sortOrder: 0,
-      });
       setEditing(null);
       setShowForm(false);
     },
@@ -130,30 +82,9 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
     },
   });
 
-  const handleEdit = (item: Item) => {
+  const handleEdit = (item: SingularPluralItem) => {
     setEditing(item);
     setShowForm(true);
-    reset(item);
-  };
-
-  const validateBaseFormUnique = async (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return;
-    try {
-      const { data: allItems } = await apiClient.get<Item[]>(
-        `/admin/topics/${topicId}/singular-plural-items`,
-      );
-      const duplicate = allItems.find(
-        (item) => item.baseForm === trimmed && item.id !== editing?.id,
-      );
-      if (duplicate) {
-        setError('baseForm', { message: 'This word already exists' });
-      } else {
-        clearErrors('baseForm');
-      }
-    } catch {
-      // skip validation on network error
-    }
   };
 
   if (isLoading)
@@ -173,14 +104,6 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
         onClick={() => {
           setEditing(null);
           setShowForm(!showForm);
-          reset({
-            baseForm: '',
-            pluralForm: '',
-            translationRu: '',
-            translationUk: '',
-            translationEn: '',
-            sortOrder: 0,
-          });
         }}
       >
         {showForm ? 'Cancel' : 'Add Item'}
@@ -193,69 +116,12 @@ export function SingularPluralTab({ topicId }: { topicId: string }) {
       )}
 
       {showForm && (
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Box component="form" onSubmit={handleSubmit((d) => saveMutation.mutate(d))}>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('baseForm', {
-                  onBlur: (e) => validateBaseFormUnique(e.target.value),
-                })}
-                label="Base Form"
-                size="small"
-                error={!!errors.baseForm}
-                helperText={errors.baseForm?.message}
-              />
-              <TextField
-                {...register('pluralForm')}
-                label="Plural Form"
-                size="small"
-                error={!!errors.pluralForm}
-                helperText={errors.pluralForm?.message}
-              />
-              <TextField
-                {...register('sortOrder')}
-                label="Order"
-                type="number"
-                size="small"
-                sx={{ width: 80 }}
-              />
-            </Stack>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('translationRu')}
-                label="Translation (RU)"
-                size="small"
-                error={!!errors.translationRu}
-              />
-              <TextField
-                {...register('translationUk')}
-                label="Translation (UK)"
-                size="small"
-                error={!!errors.translationUk}
-              />
-              <TextField
-                {...register('translationEn')}
-                label="Translation (EN)"
-                size="small"
-                error={!!errors.translationEn}
-              />
-            </Stack>
-            <Button
-              type="submit"
-              variant="contained"
-              size="small"
-              disabled={saveMutation.isPending}
-            >
-              {saveMutation.isPending ? (
-                <CircularProgress size={20} />
-              ) : editing ? (
-                'Update'
-              ) : (
-                'Create'
-              )}
-            </Button>
-          </Box>
-        </Paper>
+        <SingularPluralForm
+          topicId={topicId}
+          editing={editing}
+          isPending={saveMutation.isPending}
+          onSubmit={(d) => saveMutation.mutate(d)}
+        />
       )}
 
       <TableContainer component={Paper}>

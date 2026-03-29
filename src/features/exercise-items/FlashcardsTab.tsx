@@ -12,47 +12,28 @@ import {
   Box,
   IconButton,
   Button,
-  TextField,
-  Stack,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { apiClient } from '../../api/client';
 import { useTablePagination } from '../../shared/hooks/useTablePagination';
-
-const schema = z.object({
-  frontText: z.string().min(1, 'Required'),
-  translationRu: z.string().min(1, 'Required'),
-  translationUk: z.string().min(1, 'Required'),
-  translationEn: z.string().min(1, 'Required'),
-  sortOrder: z.coerce.number().int().min(0),
-});
-
-type FormData = z.infer<typeof schema>;
-
-interface Item {
-  id: string;
-  frontText: string;
-  translationRu: string;
-  translationUk: string;
-  translationEn: string;
-  sortOrder: number;
-}
+import {
+  FlashcardForm,
+  type FlashcardFormData,
+  type FlashcardItem,
+} from './components/FlashcardForm';
 
 export function FlashcardsTab({ topicId }: { topicId: string }) {
   const queryClient = useQueryClient();
-  const [editing, setEditing] = useState<Item | null>(null);
+  const [editing, setEditing] = useState<FlashcardItem | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const {
     data: items,
     isLoading,
     error,
-  } = useQuery<Item[]>({
+  } = useQuery<FlashcardItem[]>({
     queryKey: ['flashcard-items', topicId],
     queryFn: async () => {
       const { data } = await apiClient.get(`/admin/topics/${topicId}/flashcard-items`);
@@ -62,24 +43,8 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
 
   const { paginatedItems, Pagination } = useTablePagination(items);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema) as never,
-    defaultValues: {
-      frontText: '',
-      translationRu: '',
-      translationUk: '',
-      translationEn: '',
-      sortOrder: 0,
-    },
-  });
-
   const saveMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: FlashcardFormData) => {
       if (editing) {
         await apiClient.patch(`/admin/flashcard-items/${editing.id}`, data);
       } else {
@@ -88,13 +53,6 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['flashcard-items', topicId] });
-      reset({
-        frontText: '',
-        translationRu: '',
-        translationUk: '',
-        translationEn: '',
-        sortOrder: 0,
-      });
       setEditing(null);
       setShowForm(false);
     },
@@ -109,10 +67,9 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
     },
   });
 
-  const handleEdit = (item: Item) => {
+  const handleEdit = (item: FlashcardItem) => {
     setEditing(item);
     setShowForm(true);
-    reset(item);
   };
 
   if (isLoading)
@@ -132,73 +89,17 @@ export function FlashcardsTab({ topicId }: { topicId: string }) {
         onClick={() => {
           setEditing(null);
           setShowForm(!showForm);
-          reset({
-            frontText: '',
-            translationRu: '',
-            translationUk: '',
-            translationEn: '',
-            sortOrder: 0,
-          });
         }}
       >
         {showForm ? 'Cancel' : 'Add Item'}
       </Button>
 
       {showForm && (
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Box component="form" onSubmit={handleSubmit((d) => saveMutation.mutate(d))}>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('frontText')}
-                label="Front Text (HR)"
-                size="small"
-                error={!!errors.frontText}
-                helperText={errors.frontText?.message}
-              />
-              <TextField
-                {...register('sortOrder')}
-                label="Order"
-                type="number"
-                size="small"
-                sx={{ width: 80 }}
-              />
-            </Stack>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('translationRu')}
-                label="Translation (RU)"
-                size="small"
-                error={!!errors.translationRu}
-              />
-              <TextField
-                {...register('translationUk')}
-                label="Translation (UK)"
-                size="small"
-                error={!!errors.translationUk}
-              />
-              <TextField
-                {...register('translationEn')}
-                label="Translation (EN)"
-                size="small"
-                error={!!errors.translationEn}
-              />
-            </Stack>
-            <Button
-              type="submit"
-              variant="contained"
-              size="small"
-              disabled={saveMutation.isPending}
-            >
-              {saveMutation.isPending ? (
-                <CircularProgress size={20} />
-              ) : editing ? (
-                'Update'
-              ) : (
-                'Create'
-              )}
-            </Button>
-          </Box>
-        </Paper>
+        <FlashcardForm
+          editing={editing}
+          isPending={saveMutation.isPending}
+          onSubmit={(d) => saveMutation.mutate(d)}
+        />
       )}
 
       <TableContainer component={Paper}>

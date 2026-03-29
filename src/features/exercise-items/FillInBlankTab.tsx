@@ -12,49 +12,28 @@ import {
   Box,
   IconButton,
   Button,
-  TextField,
-  Stack,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { apiClient } from '../../api/client';
 import { useTablePagination } from '../../shared/hooks/useTablePagination';
-
-const schema = z.object({
-  sentenceHr: z.string().min(1, 'Required'),
-  blankAnswer: z.string().min(1, 'Required'),
-  translationRu: z.string().min(1, 'Required'),
-  translationUk: z.string().min(1, 'Required'),
-  translationEn: z.string().min(1, 'Required'),
-  sortOrder: z.coerce.number().int().min(0),
-});
-
-type FormData = z.infer<typeof schema>;
-
-interface Item {
-  id: string;
-  sentenceHr: string;
-  blankAnswer: string;
-  translationRu: string;
-  translationUk: string;
-  translationEn: string;
-  sortOrder: number;
-}
+import {
+  FillInBlankForm,
+  type FillInBlankFormData,
+  type FillInBlankItem,
+} from './components/FillInBlankForm';
 
 export function FillInBlankTab({ topicId }: { topicId: string }) {
   const queryClient = useQueryClient();
-  const [editing, setEditing] = useState<Item | null>(null);
+  const [editing, setEditing] = useState<FillInBlankItem | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   const {
     data: items,
     isLoading,
     error,
-  } = useQuery<Item[]>({
+  } = useQuery<FillInBlankItem[]>({
     queryKey: ['fill-in-blank-items', topicId],
     queryFn: async () => {
       const { data } = await apiClient.get(`/admin/topics/${topicId}/fill-in-blank-items`);
@@ -64,27 +43,8 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
 
   const { paginatedItems, Pagination } = useTablePagination(items);
 
-  const defaultValues = {
-    sentenceHr: '',
-    blankAnswer: '',
-    translationRu: '',
-    translationUk: '',
-    translationEn: '',
-    sortOrder: 0,
-  };
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema) as never,
-    defaultValues,
-  });
-
   const saveMutation = useMutation({
-    mutationFn: async (data: FormData) => {
+    mutationFn: async (data: FillInBlankFormData) => {
       if (editing) {
         await apiClient.patch(`/admin/fill-in-blank-items/${editing.id}`, data);
       } else {
@@ -93,7 +53,6 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fill-in-blank-items', topicId] });
-      reset(defaultValues);
       setEditing(null);
       setShowForm(false);
     },
@@ -108,10 +67,9 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
     },
   });
 
-  const handleEdit = (item: Item) => {
+  const handleEdit = (item: FillInBlankItem) => {
     setEditing(item);
     setShowForm(true);
-    reset(item);
   };
 
   if (isLoading)
@@ -131,74 +89,17 @@ export function FillInBlankTab({ topicId }: { topicId: string }) {
         onClick={() => {
           setEditing(null);
           setShowForm(!showForm);
-          reset(defaultValues);
         }}
       >
         {showForm ? 'Cancel' : 'Add Item'}
       </Button>
 
       {showForm && (
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Box component="form" onSubmit={handleSubmit((d) => saveMutation.mutate(d))}>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('sentenceHr')}
-                label="Sentence (HR) — use {{BLANK}}"
-                size="small"
-                fullWidth
-                error={!!errors.sentenceHr}
-                helperText={errors.sentenceHr?.message}
-              />
-              <TextField
-                {...register('blankAnswer')}
-                label="Blank Answer"
-                size="small"
-                error={!!errors.blankAnswer}
-              />
-              <TextField
-                {...register('sortOrder')}
-                label="Order"
-                type="number"
-                size="small"
-                sx={{ width: 80 }}
-              />
-            </Stack>
-            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-              <TextField
-                {...register('translationRu')}
-                label="Translation (RU)"
-                size="small"
-                error={!!errors.translationRu}
-              />
-              <TextField
-                {...register('translationUk')}
-                label="Translation (UK)"
-                size="small"
-                error={!!errors.translationUk}
-              />
-              <TextField
-                {...register('translationEn')}
-                label="Translation (EN)"
-                size="small"
-                error={!!errors.translationEn}
-              />
-            </Stack>
-            <Button
-              type="submit"
-              variant="contained"
-              size="small"
-              disabled={saveMutation.isPending}
-            >
-              {saveMutation.isPending ? (
-                <CircularProgress size={20} />
-              ) : editing ? (
-                'Update'
-              ) : (
-                'Create'
-              )}
-            </Button>
-          </Box>
-        </Paper>
+        <FillInBlankForm
+          editing={editing}
+          isPending={saveMutation.isPending}
+          onSubmit={(d) => saveMutation.mutate(d)}
+        />
       )}
 
       <TableContainer component={Paper}>
