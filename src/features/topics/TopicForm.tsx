@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '../../api/client';
+import { RichTextEditor } from '../../shared/components/RichTextEditor';
 import type { TopicData } from './TopicsPage';
 
 const topicSchema = z.object({
@@ -37,6 +38,7 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [rulesHtml, setRulesHtml] = useState(topic?.rulesHtml ?? '');
   const isEditing = !!topic;
 
   const {
@@ -99,7 +101,7 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
   const onSubmit = (data: TopicFormData) => {
     setError(null);
     setSuccess(false);
-    mutation.mutate(data);
+    mutation.mutate({ ...data, rulesHtml: rulesHtml || null } as never);
   };
 
   return (
@@ -162,6 +164,15 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
           label="Active"
           sx={{ mt: 1 }}
         />
+        <Box sx={{ mt: 2 }}>
+          <RichTextEditor
+            key={topic?.id ?? 'new'}
+            value={rulesHtml}
+            onChange={setRulesHtml}
+            label="Rules (Rich Text)"
+            placeholder="Enter exercise rules..."
+          />
+        </Box>
         <Button
           type="submit"
           variant="contained"

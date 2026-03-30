@@ -13,6 +13,7 @@ export interface TopicData {
   sortOrder: number;
   isActive: boolean;
   exerciseTypes: string[];
+  rulesHtml: string | null;
   createdAt: string;
 }
 
