@@ -8,6 +8,7 @@ import {
   Paper,
   FormControlLabel,
   Checkbox,
+  Grid,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +39,10 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [rulesHtml, setRulesHtml] = useState(topic?.rulesHtml ?? '');
+  const [rulesHtmlHr, setRulesHtmlHr] = useState(topic?.rulesHtmlHr ?? '');
+  const [rulesHtmlRu, setRulesHtmlRu] = useState(topic?.rulesHtmlRu ?? '');
+  const [rulesHtmlUk, setRulesHtmlUk] = useState(topic?.rulesHtmlUk ?? '');
+  const [rulesHtmlEn, setRulesHtmlEn] = useState(topic?.rulesHtmlEn ?? '');
   const isEditing = !!topic;
 
   const {
@@ -101,11 +105,17 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
   const onSubmit = (data: TopicFormData) => {
     setError(null);
     setSuccess(false);
-    mutation.mutate({ ...data, rulesHtml: rulesHtml || null } as never);
+    mutation.mutate({
+      ...data,
+      rulesHtmlHr: rulesHtmlHr || null,
+      rulesHtmlRu: rulesHtmlRu || null,
+      rulesHtmlUk: rulesHtmlUk || null,
+      rulesHtmlEn: rulesHtmlEn || null,
+    } as never);
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 600 }}>
+    <Paper sx={{ p: 3 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
           Topic {isEditing ? 'updated' : 'created'} successfully
@@ -118,61 +128,103 @@ export function TopicForm({ topic, onDone }: TopicFormProps) {
       )}
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <TextField
-          {...register('nameHr')}
-          label="Name (HR)"
-          fullWidth
-          margin="normal"
-          error={!!errors.nameHr}
-          helperText={errors.nameHr?.message}
-        />
-        <TextField
-          {...register('nameRu')}
-          label="Name (RU)"
-          fullWidth
-          margin="normal"
-          error={!!errors.nameRu}
-          helperText={errors.nameRu?.message}
-        />
-        <TextField
-          {...register('nameUk')}
-          label="Name (UK)"
-          fullWidth
-          margin="normal"
-          error={!!errors.nameUk}
-          helperText={errors.nameUk?.message}
-        />
-        <TextField
-          {...register('nameEn')}
-          label="Name (EN)"
-          fullWidth
-          margin="normal"
-          error={!!errors.nameEn}
-          helperText={errors.nameEn?.message}
-        />
-        <TextField
-          {...register('sortOrder')}
-          label="Sort Order"
-          type="number"
-          fullWidth
-          margin="normal"
-          error={!!errors.sortOrder}
-          helperText={errors.sortOrder?.message}
-        />
-        <FormControlLabel
-          control={<Checkbox {...register('isActive')} defaultChecked={topic?.isActive ?? true} />}
-          label="Active"
-          sx={{ mt: 1 }}
-        />
-        <Box sx={{ mt: 2 }}>
-          <RichTextEditor
-            key={topic?.id ?? 'new'}
-            value={rulesHtml}
-            onChange={setRulesHtml}
-            label="Rules (Rich Text)"
-            placeholder="Enter exercise rules..."
-          />
-        </Box>
+        <Grid container spacing={2}>
+          <Grid size={6}>
+            <TextField
+              {...register('nameHr')}
+              label="Name (HR)"
+              fullWidth
+              margin="normal"
+              error={!!errors.nameHr}
+              helperText={errors.nameHr?.message}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              {...register('nameEn')}
+              label="Name (EN)"
+              fullWidth
+              margin="normal"
+              error={!!errors.nameEn}
+              helperText={errors.nameEn?.message}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              {...register('nameUk')}
+              label="Name (UK)"
+              fullWidth
+              margin="normal"
+              error={!!errors.nameUk}
+              helperText={errors.nameUk?.message}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              {...register('nameRu')}
+              label="Name (RU)"
+              fullWidth
+              margin="normal"
+              error={!!errors.nameRu}
+              helperText={errors.nameRu?.message}
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              {...register('sortOrder')}
+              label="Sort Order"
+              type="number"
+              fullWidth
+              margin="normal"
+              error={!!errors.sortOrder}
+              helperText={errors.sortOrder?.message}
+            />
+          </Grid>
+          <Grid size={6} sx={{ display: 'flex', alignItems: 'center' }}>
+            <FormControlLabel
+              control={
+                <Checkbox {...register('isActive')} defaultChecked={topic?.isActive ?? true} />
+              }
+              label="Active"
+            />
+          </Grid>
+          <Grid size={6}>
+            <RichTextEditor
+              key={`${topic?.id ?? 'new'}-hr`}
+              value={rulesHtmlHr}
+              onChange={setRulesHtmlHr}
+              label="Rules (HR)"
+              placeholder="Enter rules in Croatian..."
+            />
+          </Grid>
+          <Grid size={6}>
+            <RichTextEditor
+              key={`${topic?.id ?? 'new'}-en`}
+              value={rulesHtmlEn}
+              onChange={setRulesHtmlEn}
+              label="Rules (EN)"
+              placeholder="Enter rules in English..."
+            />
+          </Grid>
+          <Grid size={6}>
+            <RichTextEditor
+              key={`${topic?.id ?? 'new'}-uk`}
+              value={rulesHtmlUk}
+              onChange={setRulesHtmlUk}
+              label="Rules (UK)"
+              placeholder="Enter rules in Ukrainian..."
+            />
+          </Grid>
+          <Grid size={6}>
+            <RichTextEditor
+              key={`${topic?.id ?? 'new'}-ru`}
+              value={rulesHtmlRu}
+              onChange={setRulesHtmlRu}
+              label="Rules (RU)"
+              placeholder="Enter rules in Russian..."
+            />
+          </Grid>
+        </Grid>
         <Button
           type="submit"
           variant="contained"
